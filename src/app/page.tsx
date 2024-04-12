@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
+
 import Header from "./header";
 
 interface City {
@@ -24,11 +26,19 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [sortField, setSortField] = useState("");
-  const [sortOrder, setSortOrder] = useState("ASC");
-  const [filterQuery, setFilterQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [filterQuery, setFilterQuery] = useState(searchParams.get("search") || "");
 
+  
   const limit = 10;
+
+  const router = useRouter();
+
+  const sortField = searchParams.get("sort") || "";
+  const sortOrder = searchParams.get("order") || "ASC";
+  const searchText = searchParams.get("search") || "";
+
+  
 
   const fetchCities = async () => {
     setIsLoading(true);
@@ -41,12 +51,18 @@ export default function Home() {
     console.log("queryParams", queryParams);
 
     try {
+      let whereQuery = "where=";
+
+      if (searchText) {
+        whereQuery += `search(name,'${searchText}')`;
+      }
+
       const response = await axios.get(
-        `https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&limit=${limit}&start=${offset}&${queryParams}`
+        `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=${limit}&start=${offset}&${queryParams}&${whereQuery}`
       );
-      setCities((prevCities) => [...prevCities, ...response.data.records]);
+      setCities((prevCities) => [...prevCities, ...response.data.results]);
       setOffset((prevOffset) => prevOffset + limit);
-      setHasMore(response.data.records.length === limit);
+      setHasMore(response.data.results.length === limit);
     } catch (error) {
       console.error("Error fetching cities:", error);
     } finally {
@@ -54,38 +70,46 @@ export default function Home() {
     }
   };
 
-  const handleSort = (field: string) => {
-    // Immediately handle the field update
-    if (field === sortField) {
-      // Toggle sort order if the same field is clicked
-      setSortOrder((prevOrder) => (prevOrder === "ASC" ? "DESC" : "ASC"));
-    } else {
-      // Set new field and reset order to "ASC" when changing fields
-      setSortField(field);
-      setSortOrder("ASC");
-    }
+  const debounce = (callback: any, delay: number) => {
+    let timeoutId: any;
 
-    // Reset the offset and clear the cities list to fetch new sorted data
+    console.log("debounce");
+
+    return function () {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(callback, delay);
+    };
+  };
+
+  const setSearchText = (text: string) => {
+    setFilterQuery(text);
     setOffset(0);
-    setCities([]);
+    // workaround
+    globalThis.text = text;
+    setLocation(); // Remove the argument from the function call
+  };
+
+  const setLocation = debounce(() => {
+    console.log("setting location");
+    location.href = `?sort=${sortField}&order=${sortOrder}&search=${globalThis.text}`; // Use filterQuery instead of text
+  }, 1000);
+
+  const handleSort = (field: string) => {
+    const newOrder =
+      sortField === field && sortOrder === "ASC" ? "DESC" : "ASC";
+    setOffset(0);
+    // router.push(`?sort=${field}&order=${newOrder}`);
+    location.href = `?sort=${field}&order=${newOrder}`;
   };
 
   useEffect(() => {
     fetchCities();
-  }, [sortField, sortOrder, filterQuery]);
+  }, [searchParams]);
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-8">
-      <Header filterQuery={filterQuery} setFilterQuery={setFilterQuery} />
-      <div className="mb-4">
-        <input
-          type="text"
-          value={filterQuery}
-          onChange={(e) => setFilterQuery(e.target.value)}
-          placeholder="Filter cities..."
-          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
-        />
-      </div>
+      <Header filterQuery={filterQuery} setFilterQuery={setSearchText} />
+
       <InfiniteScroll
         dataLength={cities.length}
         next={fetchCities}
@@ -105,6 +129,7 @@ export default function Home() {
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider"
+                onClick={() => handleSort("cou_name_en")}
               >
                 Country
               </th>
@@ -123,19 +148,19 @@ export default function Home() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {cities.map((city, index) => (
+            {cities.map((city: any, index) => (
               <tr key={index}>
                 <td className="px-6 py-4 whitespace-nowrap text-black">
-                  {city.fields.name}
+                  <a href={`/weather?city=${city.name}`} target="_blank">{city.name}</a>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-black">
-                  {city.fields.cou_name_en}
+                  {city.cou_name_en}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-black">
-                  {city.fields.timezone}
+                  {city.timezone}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-black">
-                  {city.fields.population}
+                  {city.population}
                 </td>
               </tr>
             ))}
