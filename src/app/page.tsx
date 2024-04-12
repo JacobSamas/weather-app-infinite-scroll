@@ -151,7 +151,7 @@ export default function Home() {
             {cities.map((city: any, index) => (
               <tr key={index}>
                 <td className="px-6 py-4 whitespace-nowrap text-black">
-                  <a href={`/weather?city=${city.name}`} target="_blank">{city.name}</a>
+                  <a href={`/weather?lat=${city.coordinates.lat}&lon=${city.coordinates.lon}`} target="_blank">{city.name}</a>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-black">
                   {city.cou_name_en}
