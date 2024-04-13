@@ -21,30 +21,55 @@ export default function Page() {
         })
         .catch((err) => {
           console.error(err);
+          setError('Failed to fetch weather data');
         });
     }
-  }, [lat, lon]); // Dependencies to trigger the effect
+  }, [lat, lon]);
+
+  const weatherBackground = (description) => {
+    if (!description) return 'bg-gray-200';
+    const weatherType = description.toLowerCase();
+    if (weatherType.includes('cloud')) return 'bg-gray-300';
+    if (weatherType.includes('rain')) return 'bg-blue-400';
+    if (weatherType.includes('clear')) return 'bg-blue-200';
+    return 'bg-indigo-300';
+  };
+
+  const getWeatherEmoji = (weather) => {
+    const main = weather.main;
+    if (main === 'Clear') return '☀️';
+    if (main === 'Clouds') return '☁️';
+    if (main === 'Rain') return '🌧';
+    if (main === 'Snow') return '❄️';
+    if (main === 'Drizzle') return '🌦';
+    if (main === 'Thunderstorm') return '⛈';
+    return '🌀'; // for other types of weather
+  };
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="text-red-500 text-lg p-4">Error: {error}</div>;
   }
 
   if (!weatherData) {
-    return <div>Loading...</div>; // Or some other placeholder content
+    return <div className="text-blue-500 text-lg p-4">Loading...</div>;
   }
 
   const { main, weather, wind, sys, name } = weatherData;
   const temperature = main.temp - 273.15; // Convert Kelvin to Celsius
+  const background = weatherBackground(weather[0].description);
+  const emoji = getWeatherEmoji(weather[0]);
 
   return (
-    <div>
-      <h1>Weather in {name}</h1>
-      <p>Current Temperature: {temperature.toFixed(2)}°C</p>
-      <p>Description: {weather[0].description}</p>
-      <p>Humidity: {main.humidity}%</p>
-      <p>Wind Speed: {wind.speed} m/s</p>
-      <p>Sunrise: {new Date(sys.sunrise * 1000).toLocaleTimeString()}</p>
-      <p>Sunset: {new Date(sys.sunset * 1000).toLocaleTimeString()}</p>
+    <div className={`p-5 ${background} flex flex-col items-center justify-center min-h-screen transition-all duration-500`}>
+      <div className="text-white text-center shadow-lg p-5 rounded-lg bg-opacity-80 bg-black">
+        <h1 className="text-4xl font-bold mb-2">Weather in {name} {emoji}</h1>
+        <p className="text-xl">Current Temperature: {temperature.toFixed(2)}°C</p>
+        <p className="text-lg capitalize">{weather[0].description}</p>
+        <p className="text-lg">Humidity: {main.humidity}%</p>
+        <p className="text-lg">Wind Speed: {wind.speed} m/s</p>
+        <p className="text-lg">Sunrise: {new Date(sys.sunrise * 1000).toLocaleTimeString()}</p>
+        <p className="text-lg">Sunset: {new Date(sys.sunset * 1000).toLocaleTimeString()}</p>
+      </div>
     </div>
   );
 }
