@@ -31,3 +31,8 @@ body {
     text-wrap: balance;
   }
 }
+
+
+.infinite-scroll-component__outerdiv{
+  z-index: 1;
+}

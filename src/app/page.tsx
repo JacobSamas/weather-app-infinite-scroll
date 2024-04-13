@@ -109,69 +109,81 @@ export default function Home() {
     <main className="flex flex-col items-center justify-center min-h-screen p-8">
       <Header filterQuery={filterQuery} setFilterQuery={setSearchText} />
 
-      <InfiniteScroll
-        className="mt-16"
-        dataLength={cities.length}
-        next={fetchCities}
-        hasMore={hasMore}
-        loader={<h4 className="text-black">Loading...</h4>}
+      <div
+        style={{
+          height: "calc(100vh - 150px)",
+          overflow: "auto",
+          display: "flex",
+          flexDirection: "column",
+        }}
+        id="scrollableDiv"
       >
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50 fixed">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("name")}
-              >
-                City Name
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider"
-                onClick={() => handleSort("cou_name_en")}
-              >
-                Country
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider"
-              >
-                Timezone
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider"
-              >
-                Population
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200 overflow-scroll pt-12">
-            {cities.map((city: any, index) => (
-              <tr key={index}>
-                <td className="px-6 py-4 whitespace-nowrap text-black">
-                  <a
-                    href={`/weather?lat=${city.coordinates.lat}&lon=${city.coordinates.lon}`}
-                    target="_blank"
-                  >
-                    {city.name}
-                  </a>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-black">
-                  {city.cou_name_en}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-black">
-                  {city.timezone}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-black">
-                  {city.population}
-                </td>
+        <InfiniteScroll
+          className="w-full mt-16"
+          dataLength={cities.length}
+          next={fetchCities}
+          style={{ display: "flex", flexDirection: "column" }} //To put endMessage and loader to the top.
+          hasMore={hasMore}
+          scrollableTarget="scrollableDiv"
+          loader={<h4 className="text-black">Loading...</h4>}
+        >
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50 fixed top-16 z-10">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("name")}
+                >
+                  City Name
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider"
+                  onClick={() => handleSort("cou_name_en")}
+                >
+                  Country
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider"
+                >
+                  Timezone
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider"
+                >
+                  Population
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </InfiniteScroll>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {cities.map((city, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-4 whitespace-nowrap text-black">
+                    <a
+                      href={`/weather?lat=${city.coordinates.lat}&lon=${city.coordinates.lon}`}
+                      target="_blank"
+                    >
+                      {city.name}
+                    </a>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-black">
+                    {city.cou_name_en}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-black">
+                    {city.timezone}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-black">
+                    {city.population}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </InfiniteScroll>
+      </div>
       {isLoading && (
         <div className="flex justify-center items-center mt-4">
           <p className="text-lg text-black">Loading more cities...</p>
