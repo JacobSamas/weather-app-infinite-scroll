@@ -7,7 +7,7 @@ interface HeaderProps {
 
 const Header = ({ filterQuery, setFilterQuery }: HeaderProps): JSX.Element => {
   return (
-    <header className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-lg">
+    <header className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-lg fixed top-0">
       <div className="container mx-auto flex justify-between items-center p-6">
         <h1 className="text-3xl font-bold flex items-center">
           {/* Optionally add an icon or logo here */}

@@ -27,9 +27,10 @@ export default function Home() {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const searchParams = useSearchParams();
-  const [filterQuery, setFilterQuery] = useState(searchParams.get("search") || "");
+  const [filterQuery, setFilterQuery] = useState(
+    searchParams.get("search") || ""
+  );
 
-  
   const limit = 10;
 
   const router = useRouter();
@@ -37,8 +38,6 @@ export default function Home() {
   const sortField = searchParams.get("sort") || "";
   const sortOrder = searchParams.get("order") || "ASC";
   const searchText = searchParams.get("search") || "";
-
-  
 
   const fetchCities = async () => {
     setIsLoading(true);
@@ -111,13 +110,14 @@ export default function Home() {
       <Header filterQuery={filterQuery} setFilterQuery={setSearchText} />
 
       <InfiniteScroll
+        className="mt-16"
         dataLength={cities.length}
         next={fetchCities}
         hasMore={hasMore}
         loader={<h4 className="text-black">Loading...</h4>}
       >
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 fixed">
             <tr>
               <th
                 scope="col"
@@ -147,11 +147,16 @@ export default function Home() {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-200 overflow-scroll pt-12">
             {cities.map((city: any, index) => (
               <tr key={index}>
                 <td className="px-6 py-4 whitespace-nowrap text-black">
-                  <a href={`/weather?lat=${city.coordinates.lat}&lon=${city.coordinates.lon}`} target="_blank">{city.name}</a>
+                  <a
+                    href={`/weather?lat=${city.coordinates.lat}&lon=${city.coordinates.lon}`}
+                    target="_blank"
+                  >
+                    {city.name}
+                  </a>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-black">
                   {city.cou_name_en}
