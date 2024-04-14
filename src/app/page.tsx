@@ -114,12 +114,13 @@ export default function Home() {
 
       <div
         style={{
-          height: "calc(100vh - 160px)",
+          height: "90vh",
           overflow: "auto",
           display: "flex",
           flexDirection: "column",
+          marginTop: "5.25rem",
         }}
-        className="w-full mt-4"
+        className="w-full"
         id="scrollableDiv"
       >
         <InfiniteScroll
@@ -130,7 +131,7 @@ export default function Home() {
           scrollableTarget="scrollableDiv"
           loader={<h4 className="text-black">Loading...</h4>}
         >
-          <table className="min-w-full divide-y divide-gray-200 relative">
+          <table className="min-w-full divide-y divide-gray-200 h-[90vh] relative">
             <thead className="bg-gray-50 w-full sticky top-0 z-10">
               <tr>
                 <th
