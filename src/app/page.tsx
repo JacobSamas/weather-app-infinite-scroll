@@ -6,6 +6,8 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
 import Header from "./header";
 
+declare var window:any
+
 interface City {
   recordid: string;
   fields: {
@@ -80,18 +82,19 @@ export default function Home() {
     };
   };
 
+
   const setSearchText = (text: string) => {
     setFilterQuery(text);
     setOffset(0);
     // workaround
-    globalThis.text = text;
+    window.text = text
     setLocation(); // Remove the argument from the function call
   };
 
   const setLocation = debounce(() => {
     console.log("setting location");
-    location.href = `?sort=${sortField}&order=${sortOrder}&search=${globalThis.text}`; // Use filterQuery instead of text
-  }, 1000);
+    location.href = `?sort=${sortField}&order=${sortOrder}&search=${window.text}`; // Use filterQuery instead of text
+  }, 2000);
 
   const handleSort = (field: string) => {
     const newOrder =
@@ -106,20 +109,20 @@ export default function Home() {
   }, [searchParams]);
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen p-8">
+    <main className="flex flex-col items-center justify-center min-h-screen">
       <Header filterQuery={filterQuery} setFilterQuery={setSearchText} />
 
       <div
         style={{
-          height: "calc(100vh - 150px)",
+          height: "calc(100vh - 160px)",
           overflow: "auto",
           display: "flex",
           flexDirection: "column",
         }}
+        className="w-full mt-4"
         id="scrollableDiv"
       >
         <InfiniteScroll
-          className="w-full mt-16"
           dataLength={cities.length}
           next={fetchCities}
           style={{ display: "flex", flexDirection: "column" }} //To put endMessage and loader to the top.
@@ -127,8 +130,8 @@ export default function Home() {
           scrollableTarget="scrollableDiv"
           loader={<h4 className="text-black">Loading...</h4>}
         >
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 fixed top-16 z-10">
+          <table className="min-w-full divide-y divide-gray-200 relative">
+            <thead className="bg-gray-50 w-full sticky top-0 z-10">
               <tr>
                 <th
                   scope="col"
@@ -159,7 +162,7 @@ export default function Home() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {cities.map((city, index) => (
+              {cities.map((city: any, index) => (
                 <tr key={index}>
                   <td className="px-6 py-4 whitespace-nowrap text-black">
                     <a

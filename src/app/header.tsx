@@ -2,13 +2,13 @@ import React from 'react';
 
 interface HeaderProps {
   filterQuery: string;
-  setFilterQuery: React.Dispatch<React.SetStateAction<string>>;
+  setFilterQuery: any;
 }
 
 const Header = ({ filterQuery, setFilterQuery }: HeaderProps): JSX.Element => {
   return (
-    <header className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-lg fixed top-0">
-      <div className="container mx-auto flex justify-between items-center p-6">
+    <header className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-lg w-full fixed top-0">
+      <div className=" mx-auto flex justify-between items-center p-6">
         <h1 className="text-3xl font-bold flex items-center">
           {/* Optionally add an icon or logo here */}
           <span>Weather App</span>
@@ -32,6 +32,7 @@ const Header = ({ filterQuery, setFilterQuery }: HeaderProps): JSX.Element => {
             type="text"
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
+            autoFocus={true}
             placeholder="Filter cities..."
             className="w-full pl-10 pr-4 py-2 rounded leading-tight focus:outline-none bg-gray-700 text-white placeholder-gray-400 transition duration-300 focus:bg-gray-600"
           />
